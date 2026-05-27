@@ -31,3 +31,35 @@ button {
   color: #b00020;
   margin: 0.25rem 0 0;
 }
+
+.storage-error {
+  background: #fff4e5;
+  border: 1px solid #f0b429;
+  padding: 0.75rem;
+}
+
+.empty-state {
+  font-style: italic;
+}
+
+.task-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-active {
+  border-left: 4px solid #2b8a3e;
+}
+
+.task-completed {
+  border-left: 4px solid #6c757d;
+  opacity: 0.85;
+}
+
+.task-status {
+  font-size: 0.85rem;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+}
