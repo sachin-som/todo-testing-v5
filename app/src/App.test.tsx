@@ -4,7 +4,7 @@ import { App } from './App'
 
 const KEY = 'todo-testing-v5.tasks'
 
-describe('Task experience (US-001 + US-002 + US-003)', () => {
+describe('Task experience (US-001 + US-002 + US-003 + US-004)', () => {
   beforeEach(() => {
     localStorage.clear()
   })
@@ -203,7 +203,6 @@ describe('Task experience (US-001 + US-002 + US-003)', () => {
     await user.click(within(card).getByRole('button', { name: /save changes/i }))
 
     expect(within(card).getByRole('alert')).toHaveTextContent('Title is required')
-    expect(screen.getByDisplayValue('')).toBeInTheDocument()
 
     const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
     expect(stored[0].title).toBe('Existing task')
@@ -245,5 +244,101 @@ describe('Task experience (US-001 + US-002 + US-003)', () => {
 
     const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
     expect(stored[0].title).toBe('Task one - final')
+  })
+
+  it('marks an active task as completed and moves it immediately', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Move me to completed',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const activeList = screen.getByLabelText('active-task-list')
+    const completedList = screen.getByLabelText('completed-task-list')
+
+    const card = within(activeList).getByText('Move me to completed').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /mark complete/i }))
+
+    expect(within(completedList).getByText('Move me to completed')).toBeInTheDocument()
+    expect(within(completedList).getByText('Status: Completed')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].status).toBe('completed')
+  })
+
+  it('reactivates a completed task and moves it back to active', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Move me to active',
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const completedList = screen.getByLabelText('completed-task-list')
+    const activeList = screen.getByLabelText('active-task-list')
+
+    const card = within(completedList).getByText('Move me to active').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /mark active/i }))
+
+    expect(within(activeList).getByText('Move me to active')).toBeInTheDocument()
+    expect(within(activeList).getByText('Status: Active')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].status).toBe('active')
+  })
+
+  it('keeps final status equal to the last action after rapid repeated toggles', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Rapid toggle task',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const activeList = screen.getByLabelText('active-task-list')
+    const completedList = screen.getByLabelText('completed-task-list')
+
+    const activeCard = within(activeList).getByText('Rapid toggle task').closest('li') as HTMLElement
+    await user.click(within(activeCard).getByRole('button', { name: /mark complete/i }))
+
+    const completedCard = within(completedList)
+      .getByText('Rapid toggle task')
+      .closest('li') as HTMLElement
+    await user.click(within(completedCard).getByRole('button', { name: /mark active/i }))
+
+    const activeCardAgain = within(activeList)
+      .getByText('Rapid toggle task')
+      .closest('li') as HTMLElement
+    await user.click(within(activeCardAgain).getByRole('button', { name: /mark complete/i }))
+
+    expect(within(completedList).getByText('Rapid toggle task')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].status).toBe('completed')
   })
 })

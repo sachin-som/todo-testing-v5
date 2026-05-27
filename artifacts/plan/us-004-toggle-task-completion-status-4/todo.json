@@ -1,0 +1,32 @@
+[
+  {
+    "id": "US4-T1",
+    "title": "Review current status model and rendering/action integration points",
+    "status": "completed"
+  },
+  {
+    "id": "US4-T2",
+    "title": "Implement task status toggle handlers using functional state updates",
+    "status": "completed"
+  },
+  {
+    "id": "US4-T3",
+    "title": "Persist toggles to storage and preserve recovery messaging behavior",
+    "status": "completed"
+  },
+  {
+    "id": "US4-T4",
+    "title": "Add UI controls for active→completed and completed→active transitions",
+    "status": "completed"
+  },
+  {
+    "id": "US4-T5",
+    "title": "Add/update tests for immediate transitions and rapid repeated toggles",
+    "status": "completed"
+  },
+  {
+    "id": "US4-T6",
+    "title": "Run lint/build/tests (or document environment blocker) and finalize",
+    "status": "pending"
+  }
+]
