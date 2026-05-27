@@ -1,0 +1,37 @@
+[
+  {
+    "id": "1",
+    "title": "Inspect codebase structure and identify task creation flow entry points",
+    "status": "completed"
+  },
+  {
+    "id": "2",
+    "title": "Implement/adjust task creation form with required title and optional fields",
+    "status": "completed"
+  },
+  {
+    "id": "3",
+    "title": "Add inline validation for empty title and block submission",
+    "status": "completed"
+  },
+  {
+    "id": "4",
+    "title": "Wire persistence to local storage for created tasks",
+    "status": "completed"
+  },
+  {
+    "id": "5",
+    "title": "Ensure new task appears immediately in active list with optional metadata",
+    "status": "completed"
+  },
+  {
+    "id": "6",
+    "title": "Add/extend tests for all acceptance criteria",
+    "status": "completed"
+  },
+  {
+    "id": "7",
+    "title": "Run lint/test/build and fix any issues",
+    "status": "in_progress"
+  }
+]
