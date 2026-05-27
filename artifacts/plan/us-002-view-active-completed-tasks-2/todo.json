@@ -1,0 +1,37 @@
+[
+  {
+    "id": "1",
+    "title": "Review current task model/rendering and identify status display updates",
+    "status": "completed"
+  },
+  {
+    "id": "2",
+    "title": "Harden storage read/write with recoverable error handling",
+    "status": "completed"
+  },
+  {
+    "id": "3",
+    "title": "Implement active vs completed visual distinction in UI",
+    "status": "completed"
+  },
+  {
+    "id": "4",
+    "title": "Implement empty state prompt when no tasks exist",
+    "status": "completed"
+  },
+  {
+    "id": "5",
+    "title": "Show recoverable storage error message without crashing",
+    "status": "completed"
+  },
+  {
+    "id": "6",
+    "title": "Add tests for US-002 acceptance criteria",
+    "status": "completed"
+  },
+  {
+    "id": "7",
+    "title": "Run lint/test/build and fix any issues",
+    "status": "in_progress"
+  }
+]

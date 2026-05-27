@@ -1,5 +1,5 @@
 import { FormEvent, useMemo, useState } from 'react'
-import { loadTasks, saveTasks } from './storage'
+import { getStorageRecoveryMessage, loadTasks, saveTasks } from './storage'
 import { Task, TaskPriority } from './types'
 
 const priorities: TaskPriority[] = ['low', 'medium', 'high']
@@ -22,7 +22,11 @@ const newTask = (input: {
 })
 
 export function App() {
-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks())
+  const initialLoad = loadTasks()
+  const [tasks, setTasks] = useState<Task[]>(initialLoad.data)
+  const [storageError, setStorageError] = useState<string | null>(
+    initialLoad.error ?? null,
+  )
   const [title, setTitle] = useState('')
   const [details, setDetails] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -32,6 +36,10 @@ export function App() {
 
   const activeTasks = useMemo(
     () => tasks.filter((task) => task.status === 'active'),
+    [tasks],
+  )
+  const completedTasks = useMemo(
+    () => tasks.filter((task) => task.status === 'completed'),
     [tasks],
   )
 
@@ -54,7 +62,12 @@ export function App() {
 
     const updated = [created, ...tasks]
     setTasks(updated)
-    saveTasks(updated)
+    const saveResult = saveTasks(updated)
+    if (saveResult.error) {
+      setStorageError(getStorageRecoveryMessage())
+    } else {
+      setStorageError(null)
+    }
 
     setTitle('')
     setDetails('')
@@ -127,11 +140,36 @@ export function App() {
         <button type="submit">Save Task</button>
       </form>
 
+      {storageError ? (
+        <p role="status" className="storage-error">
+          {storageError}
+        </p>
+      ) : null}
+
       <section aria-label="task-list">
+        {tasks.length === 0 ? (
+          <p className="empty-state">No tasks yet. Create your first task to get started.</p>
+        ) : null}
+
         <h2>Active Tasks</h2>
         <ul>
           {activeTasks.map((task) => (
-            <li key={task.id}>
+            <li key={task.id} className="task-card task-active">
+              <p className="task-status">Status: Active</p>
+              <strong>{task.title}</strong>
+              {task.details ? <p>{task.details}</p> : null}
+              {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
+              {task.priority ? <p>Priority: {task.priority}</p> : null}
+              {task.tag ? <p>Tag: {task.tag}</p> : null}
+            </li>
+          ))}
+        </ul>
+
+        <h2>Completed Tasks</h2>
+        <ul>
+          {completedTasks.map((task) => (
+            <li key={task.id} className="task-card task-completed">
+              <p className="task-status">Status: Completed</p>
               <strong>{task.title}</strong>
               {task.details ? <p>{task.details}</p> : null}
               {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
