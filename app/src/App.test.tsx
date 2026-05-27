@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { App } from './App'
 
 const KEY = 'todo-testing-v5.tasks'
 
-describe('Task experience (US-001 + US-002)', () => {
+describe('Task experience (US-001 + US-002 + US-003)', () => {
   beforeEach(() => {
     localStorage.clear()
   })
@@ -127,5 +127,123 @@ describe('Task experience (US-001 + US-002)', () => {
     )
 
     getItemSpy.mockRestore()
+  })
+
+  it('updates title, due date, priority, and tag and shows updated values immediately', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Original title',
+          dueDate: '2026-06-01',
+          priority: 'low',
+          tag: 'home',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const card = screen.getByText('Original title').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /edit task/i }))
+
+    const titleInput = within(card).getByLabelText(/^title$/i)
+    await user.clear(titleInput)
+    await user.type(titleInput, 'Updated title')
+
+    const dueDateInput = within(card).getByLabelText(/due date/i)
+    await user.clear(dueDateInput)
+    await user.type(dueDateInput, '2026-07-15')
+
+    await user.selectOptions(within(card).getByLabelText(/priority/i), 'high')
+
+    const tagInput = within(card).getByLabelText(/tag/i)
+    await user.clear(tagInput)
+    await user.type(tagInput, 'work')
+
+    await user.click(within(card).getByRole('button', { name: /save changes/i }))
+
+    expect(screen.getByText('Updated title')).toBeInTheDocument()
+    expect(screen.getByText('Due: 2026-07-15')).toBeInTheDocument()
+    expect(screen.getByText('Priority: high')).toBeInTheDocument()
+    expect(screen.getByText('Tag: work')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].title).toBe('Updated title')
+    expect(stored[0].dueDate).toBe('2026-07-15')
+    expect(stored[0].priority).toBe('high')
+    expect(stored[0].tag).toBe('work')
+  })
+
+  it('blocks edit save with inline validation when title is cleared', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Existing task',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const card = screen.getByText('Existing task').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /edit task/i }))
+
+    const titleInput = within(card).getByLabelText(/^title$/i)
+    await user.clear(titleInput)
+    await user.click(within(card).getByRole('button', { name: /save changes/i }))
+
+    expect(within(card).getByRole('alert')).toHaveTextContent('Title is required')
+    expect(screen.getByDisplayValue('')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].title).toBe('Existing task')
+  })
+
+  it('keeps last confirmed values after repeated rapid saves', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Task one',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const firstCard = screen.getByText('Task one').closest('li') as HTMLElement
+    await user.click(within(firstCard).getByRole('button', { name: /edit task/i }))
+
+    const firstTitleInput = within(firstCard).getByLabelText(/^title$/i)
+    await user.clear(firstTitleInput)
+    await user.type(firstTitleInput, 'Task one - edit 1')
+    await user.click(within(firstCard).getByRole('button', { name: /save changes/i }))
+
+    const secondCard = screen.getByText('Task one - edit 1').closest('li') as HTMLElement
+    await user.click(within(secondCard).getByRole('button', { name: /edit task/i }))
+
+    const secondTitleInput = within(secondCard).getByLabelText(/^title$/i)
+    await user.clear(secondTitleInput)
+    await user.type(secondTitleInput, 'Task one - final')
+    await user.click(within(secondCard).getByRole('button', { name: /save changes/i }))
+
+    expect(screen.getByText('Task one - final')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored[0].title).toBe('Task one - final')
   })
 })
