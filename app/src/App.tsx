@@ -4,6 +4,13 @@ import { Task, TaskPriority } from './types'
 
 const priorities: TaskPriority[] = ['low', 'medium', 'high']
 
+type EditDraft = {
+  title: string
+  dueDate: string
+  priority: string
+  tag: string
+}
+
 const newTask = (input: {
   title: string
   details?: string
@@ -33,6 +40,9 @@ export function App() {
   const [priority, setPriority] = useState('')
   const [tag, setTag] = useState('')
   const [titleError, setTitleError] = useState('')
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState<EditDraft | null>(null)
+  const [editTitleError, setEditTitleError] = useState('')
 
   const activeTasks = useMemo(
     () => tasks.filter((task) => task.status === 'active'),
@@ -75,6 +85,62 @@ export function App() {
     setPriority('')
     setTag('')
     setTitleError('')
+  }
+
+  const startEditing = (task: Task) => {
+    setEditingTaskId(task.id)
+    setEditDraft({
+      title: task.title,
+      dueDate: task.dueDate ?? '',
+      priority: task.priority ?? '',
+      tag: task.tag ?? '',
+    })
+    setEditTitleError('')
+  }
+
+  const cancelEditing = () => {
+    setEditingTaskId(null)
+    setEditDraft(null)
+    setEditTitleError('')
+  }
+
+  const saveEdit = () => {
+    if (!editingTaskId || !editDraft) {
+      return
+    }
+
+    const trimmedTitle = editDraft.title.trim()
+    if (!trimmedTitle) {
+      setEditTitleError('Title is required')
+      return
+    }
+
+    let latestTasks: Task[] = []
+    setTasks((prevTasks) => {
+      latestTasks = prevTasks.map((task) =>
+        task.id === editingTaskId
+          ? {
+              ...task,
+              title: trimmedTitle,
+              dueDate: editDraft.dueDate || undefined,
+              priority: (editDraft.priority as TaskPriority) || undefined,
+              tag: editDraft.tag.trim() || undefined,
+            }
+          : task,
+      )
+      return latestTasks
+    })
+
+    const saveResult = saveTasks(latestTasks)
+    if (saveResult.error) {
+      setStorageError(getStorageRecoveryMessage())
+    } else {
+      setStorageError(null)
+    }
+
+    setEditingTaskId(null)
+    setEditDraft(null)
+    setEditTitleError('')
   }
 
   return (
@@ -153,30 +219,172 @@ export function App() {
 
         <h2>Active Tasks</h2>
         <ul>
-          {activeTasks.map((task) => (
-            <li key={task.id} className="task-card task-active">
-              <p className="task-status">Status: Active</p>
-              <strong>{task.title}</strong>
-              {task.details ? <p>{task.details}</p> : null}
-              {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
-              {task.priority ? <p>Priority: {task.priority}</p> : null}
-              {task.tag ? <p>Tag: {task.tag}</p> : null}
-            </li>
-          ))}
+          {activeTasks.map((task) => {
+            const isEditing = editingTaskId === task.id && editDraft !== null
+            return (
+              <li key={task.id} className="task-card task-active">
+                <p className="task-status">Status: Active</p>
+                {isEditing ? (
+                  <>
+                    <div>
+                      <label htmlFor={`edit-title-${task.id}`}>Title</label>
+                      <input
+                        id={`edit-title-${task.id}`}
+                        value={editDraft.title}
+                        onChange={(e) => {
+                          setEditDraft({ ...editDraft, title: e.target.value })
+                          if (editTitleError && e.target.value.trim()) {
+                            setEditTitleError('')
+                          }
+                        }}
+                      />
+                      {editTitleError ? <p role="alert">{editTitleError}</p> : null}
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-due-date-${task.id}`}>Due Date</label>
+                      <input
+                        id={`edit-due-date-${task.id}`}
+                        type="date"
+                        value={editDraft.dueDate}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, dueDate: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-priority-${task.id}`}>Priority</label>
+                      <select
+                        id={`edit-priority-${task.id}`}
+                        value={editDraft.priority}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, priority: e.target.value })
+                        }
+                      >
+                        <option value="">None</option>
+                        {priorities.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-tag-${task.id}`}>Tag</label>
+                      <input
+                        id={`edit-tag-${task.id}`}
+                        value={editDraft.tag}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, tag: e.target.value })
+                        }
+                      />
+                    </div>
+                    <button type="button" onClick={saveEdit}>
+                      Save Changes
+                    </button>
+                    <button type="button" onClick={cancelEditing}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <strong>{task.title}</strong>
+                    {task.details ? <p>{task.details}</p> : null}
+                    {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
+                    {task.priority ? <p>Priority: {task.priority}</p> : null}
+                    {task.tag ? <p>Tag: {task.tag}</p> : null}
+                    <button type="button" onClick={() => startEditing(task)}>
+                      Edit Task
+                    </button>
+                  </>
+                )}
+              </li>
+            )
+          })}
         </ul>
 
         <h2>Completed Tasks</h2>
         <ul>
-          {completedTasks.map((task) => (
-            <li key={task.id} className="task-card task-completed">
-              <p className="task-status">Status: Completed</p>
-              <strong>{task.title}</strong>
-              {task.details ? <p>{task.details}</p> : null}
-              {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
-              {task.priority ? <p>Priority: {task.priority}</p> : null}
-              {task.tag ? <p>Tag: {task.tag}</p> : null}
-            </li>
-          ))}
+          {completedTasks.map((task) => {
+            const isEditing = editingTaskId === task.id && editDraft !== null
+            return (
+              <li key={task.id} className="task-card task-completed">
+                <p className="task-status">Status: Completed</p>
+                {isEditing ? (
+                  <>
+                    <div>
+                      <label htmlFor={`edit-title-${task.id}`}>Title</label>
+                      <input
+                        id={`edit-title-${task.id}`}
+                        value={editDraft.title}
+                        onChange={(e) => {
+                          setEditDraft({ ...editDraft, title: e.target.value })
+                          if (editTitleError && e.target.value.trim()) {
+                            setEditTitleError('')
+                          }
+                        }}
+                      />
+                      {editTitleError ? <p role="alert">{editTitleError}</p> : null}
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-due-date-${task.id}`}>Due Date</label>
+                      <input
+                        id={`edit-due-date-${task.id}`}
+                        type="date"
+                        value={editDraft.dueDate}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, dueDate: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-priority-${task.id}`}>Priority</label>
+                      <select
+                        id={`edit-priority-${task.id}`}
+                        value={editDraft.priority}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, priority: e.target.value })
+                        }
+                      >
+                        <option value="">None</option>
+                        {priorities.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor={`edit-tag-${task.id}`}>Tag</label>
+                      <input
+                        id={`edit-tag-${task.id}`}
+                        value={editDraft.tag}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, tag: e.target.value })
+                        }
+                      />
+                    </div>
+                    <button type="button" onClick={saveEdit}>
+                      Save Changes
+                    </button>
+                    <button type="button" onClick={cancelEditing}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <strong>{task.title}</strong>
+                    {task.details ? <p>{task.details}</p> : null}
+                    {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
+                    {task.priority ? <p>Priority: {task.priority}</p> : null}
+                    {task.tag ? <p>Tag: {task.tag}</p> : null}
+                    <button type="button" onClick={() => startEditing(task)}>
+                      Edit Task
+                    </button>
+                  </>
+                )}
+              </li>
+            )
+          })}
         </ul>
       </section>
     </main>

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "US3-T1",
+    "title": "Assess task model and edit integration points in UI/state/storage",
+    "status": "completed"
+  },
+  {
+    "id": "US3-T2",
+    "title": "Implement edit mode UI for title, due date, priority, and tags with save/cancel controls",
+    "status": "completed"
+  },
+  {
+    "id": "US3-T3",
+    "title": "Implement save flow with inline title validation and local storage persistence",
+    "status": "completed"
+  },
+  {
+    "id": "US3-T4",
+    "title": "Ensure repeated save operations are last-write-wins and reflected immediately",
+    "status": "completed"
+  },
+  {
+    "id": "US3-T5",
+    "title": "Add/update tests for edit success, empty-title validation, and rapid repeated saves",
+    "status": "completed"
+  },
+  {
+    "id": "US3-T6",
+    "title": "Run lint, build, and tests; fix any issues",
+    "status": "completed"
+  }
+]
