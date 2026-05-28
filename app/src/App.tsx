@@ -1,29 +1,42 @@
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { getStorageRecoveryMessage, loadTasks, saveTasks } from './storage'
 import { Task, TaskPriority } from './types'
 
 const priorities: TaskPriority[] = ['low', 'medium', 'high']
 
-type EditDraft = {
+type TaskDraft = {
   title: string
+  details: string
   dueDate: string
   priority: string
   tag: string
 }
 
-const newTask = (input: {
-  title: string
-  details?: string
-  dueDate?: string
-  priority?: TaskPriority
-  tag?: string
-}): Task => ({
+const createEmptyDraft = (): TaskDraft => ({
+  title: '',
+  details: '',
+  dueDate: '',
+  priority: '',
+  tag: '',
+})
+
+type EditDraft = TaskDraft
+
+const normalizeTagList = (raw: string): string[] | undefined => {
+  const tags = raw
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+  return tags.length > 0 ? tags : undefined
+}
+
+const newTask = (input: TaskDraft): Task => ({
   id: crypto.randomUUID(),
   title: input.title,
-  details: input.details,
-  dueDate: input.dueDate,
-  priority: input.priority,
-  tag: input.tag,
+  details: input.details || undefined,
+  dueDate: input.dueDate || undefined,
+  priority: (input.priority as TaskPriority) || undefined,
+  tags: normalizeTagList(input.tag),
   status: 'active',
   createdAt: new Date().toISOString(),
 })
@@ -34,12 +47,9 @@ export function App() {
   const [storageError, setStorageError] = useState<string | null>(
     initialLoad.error ?? null,
   )
-  const [title, setTitle] = useState('')
-  const [details, setDetails] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [priority, setPriority] = useState('')
-  const [tag, setTag] = useState('')
+  const [draft, setDraft] = useState<TaskDraft>(createEmptyDraft)
   const [titleError, setTitleError] = useState('')
+  const titleInputRef = useRef<HTMLInputElement | null>(null)
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<EditDraft | null>(null)
   const [editTitleError, setEditTitleError] = useState('')
@@ -56,18 +66,16 @@ export function App() {
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
 
-    const trimmedTitle = title.trim()
+    const trimmedTitle = draft.title.trim()
     if (!trimmedTitle) {
       setTitleError('Title is required')
+      titleInputRef.current?.focus()
       return
     }
 
     const created = newTask({
+      ...draft,
       title: trimmedTitle,
-      details: details.trim() || undefined,
-      dueDate: dueDate || undefined,
-      priority: (priority as TaskPriority) || undefined,
-      tag: tag.trim() || undefined,
     })
 
     const updated = [created, ...tasks]
@@ -79,11 +87,7 @@ export function App() {
       setStorageError(null)
     }
 
-    setTitle('')
-    setDetails('')
-    setDueDate('')
-    setPriority('')
-    setTag('')
+    setDraft(createEmptyDraft())
     setTitleError('')
   }
 
@@ -152,9 +156,10 @@ export function App() {
           <label htmlFor="title">Title</label>
           <input
             id="title"
-            value={title}
+            ref={titleInputRef}
+            value={draft.title}
             onChange={(e) => {
-              setTitle(e.target.value)
+              setDraft({ ...draft, title: e.target.value })
               if (titleError && e.target.value.trim()) {
                 setTitleError('')
               }
@@ -167,8 +172,8 @@ export function App() {
           <label htmlFor="details">Details</label>
           <textarea
             id="details"
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
+            value={draft.details}
+            onChange={(e) => setDraft({ ...draft, details: e.target.value })}
           />
         </div>
 
@@ -177,8 +182,8 @@ export function App() {
           <input
             id="dueDate"
             type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            value={draft.dueDate}
+            onChange={(e) => setDraft({ ...draft, dueDate: e.target.value })}
           />
         </div>
 
@@ -186,8 +191,8 @@ export function App() {
           <label htmlFor="priority">Priority</label>
           <select
             id="priority"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+            value={draft.priority}
+            onChange={(e) => setDraft({ ...draft, priority: e.target.value })}
           >
             <option value="">None</option>
             {priorities.map((item) => (
@@ -200,7 +205,11 @@ export function App() {
 
         <div>
           <label htmlFor="tag">Tag</label>
-          <input id="tag" value={tag} onChange={(e) => setTag(e.target.value)} />
+          <input
+            id="tag"
+            value={draft.tag}
+            onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
+          />
         </div>
 
         <button type="submit">Save Task</button>
