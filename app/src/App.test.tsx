@@ -4,7 +4,7 @@ import { App } from './App'
 
 const KEY = 'todo-testing-v5.tasks'
 
-describe('Task experience (US-001 + US-002 + US-003)', () => {
+describe('Task experience (US-001)', () => {
   beforeEach(() => {
     localStorage.clear()
   })

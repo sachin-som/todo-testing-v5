@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, useMemo, useRef, useState } from 'react'
 import { getStorageRecoveryMessage, loadTasks, saveTasks } from './storage'
 import { Task, TaskPriority } from './types'
 
@@ -22,7 +22,7 @@ const createEmptyDraft = (): TaskDraft => ({
 
 type EditDraft = TaskDraft
 
-const normalizeTagList = (raw: string): string[] | undefined => {
+const normalizeTags = (raw: string): string[] | undefined => {
   const tags = raw
     .split(',')
     .map((item) => item.trim())
@@ -30,13 +30,13 @@ const normalizeTagList = (raw: string): string[] | undefined => {
   return tags.length > 0 ? tags : undefined
 }
 
-const newTask = (input: TaskDraft): Task => ({
+const createTask = (input: TaskDraft): Task => ({
   id: crypto.randomUUID(),
   title: input.title,
   details: input.details || undefined,
   dueDate: input.dueDate || undefined,
   priority: (input.priority as TaskPriority) || undefined,
-  tags: normalizeTagList(input.tag),
+  tags: normalizeTags(input.tag),
   status: 'active',
   createdAt: new Date().toISOString(),
 })
@@ -63,6 +63,11 @@ export function App() {
     [tasks],
   )
 
+  const persistTasks = (nextTasks: Task[]) => {
+    const saveResult = saveTasks(nextTasks)
+    setStorageError(saveResult.error ?? null)
+  }
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
 
@@ -73,31 +78,23 @@ export function App() {
       return
     }
 
-    const created = newTask({
-      ...draft,
-      title: trimmedTitle,
-    })
-
+    const created = createTask({ ...draft, title: trimmedTitle })
     const updated = [created, ...tasks]
     setTasks(updated)
-    const saveResult = saveTasks(updated)
-    if (saveResult.error) {
-      setStorageError(getStorageRecoveryMessage())
-    } else {
-      setStorageError(null)
-    }
-
+    persistTasks(updated)
     setDraft(createEmptyDraft())
     setTitleError('')
+    titleInputRef.current?.focus()
   }
 
   const startEditing = (task: Task) => {
     setEditingTaskId(task.id)
     setEditDraft({
       title: task.title,
+      details: task.details ?? '',
       dueDate: task.dueDate ?? '',
       priority: task.priority ?? '',
-      tag: task.tag ?? '',
+      tag: task.tags?.join(', ') ?? '',
     })
     setEditTitleError('')
   }
@@ -108,7 +105,7 @@ export function App() {
     setEditTitleError('')
   }
 
-  const saveEdit = () => {
+  const saveEditing = () => {
     if (!editingTaskId || !editDraft) {
       return
     }
@@ -119,29 +116,21 @@ export function App() {
       return
     }
 
-    let latestTasks: Task[] = []
-    setTasks((prevTasks) => {
-      latestTasks = prevTasks.map((task) =>
-        task.id === editingTaskId
-          ? {
-              ...task,
-              title: trimmedTitle,
-              dueDate: editDraft.dueDate || undefined,
-              priority: (editDraft.priority as TaskPriority) || undefined,
-              tag: editDraft.tag.trim() || undefined,
-            }
-          : task,
-      )
-      return latestTasks
-    })
+    const updated = tasks.map((task) =>
+      task.id === editingTaskId
+        ? {
+            ...task,
+            title: trimmedTitle,
+            details: editDraft.details.trim() || undefined,
+            dueDate: editDraft.dueDate || undefined,
+            priority: (editDraft.priority as TaskPriority) || undefined,
+            tags: normalizeTags(editDraft.tag),
+          }
+        : task,
+    )
 
-    const saveResult = saveTasks(latestTasks)
-    if (saveResult.error) {
-      setStorageError(getStorageRecoveryMessage())
-    } else {
-      setStorageError(null)
-    }
-
+    setTasks(updated)
+    persistTasks(updated)
     setEditingTaskId(null)
     setEditDraft(null)
     setEditTitleError('')
@@ -204,7 +193,7 @@ export function App() {
         </div>
 
         <div>
-          <label htmlFor="tag">Tag</label>
+          <label htmlFor="tag">Tag(s)</label>
           <input
             id="tag"
             value={draft.tag}
@@ -250,6 +239,16 @@ export function App() {
                       {editTitleError ? <p role="alert">{editTitleError}</p> : null}
                     </div>
                     <div>
+                      <label htmlFor={`edit-details-${task.id}`}>Details</label>
+                      <textarea
+                        id={`edit-details-${task.id}`}
+                        value={editDraft.details}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, details: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
                       <label htmlFor={`edit-due-date-${task.id}`}>Due Date</label>
                       <input
                         id={`edit-due-date-${task.id}`}
@@ -278,7 +277,7 @@ export function App() {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor={`edit-tag-${task.id}`}>Tag</label>
+                      <label htmlFor={`edit-tag-${task.id}`}>Tag(s)</label>
                       <input
                         id={`edit-tag-${task.id}`}
                         value={editDraft.tag}
@@ -287,7 +286,7 @@ export function App() {
                         }
                       />
                     </div>
-                    <button type="button" onClick={saveEdit}>
+                    <button type="button" onClick={saveEditing}>
                       Save Changes
                     </button>
                     <button type="button" onClick={cancelEditing}>
@@ -300,7 +299,7 @@ export function App() {
                     {task.details ? <p>{task.details}</p> : null}
                     {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
                     {task.priority ? <p>Priority: {task.priority}</p> : null}
-                    {task.tag ? <p>Tag: {task.tag}</p> : null}
+                    {task.tags?.length ? <p>Tags: {task.tags.join(', ')}</p> : null}
                     <button type="button" onClick={() => startEditing(task)}>
                       Edit Task
                     </button>
@@ -335,6 +334,16 @@ export function App() {
                       {editTitleError ? <p role="alert">{editTitleError}</p> : null}
                     </div>
                     <div>
+                      <label htmlFor={`edit-details-${task.id}`}>Details</label>
+                      <textarea
+                        id={`edit-details-${task.id}`}
+                        value={editDraft.details}
+                        onChange={(e) =>
+                          setEditDraft({ ...editDraft, details: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
                       <label htmlFor={`edit-due-date-${task.id}`}>Due Date</label>
                       <input
                         id={`edit-due-date-${task.id}`}
@@ -363,7 +372,7 @@ export function App() {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor={`edit-tag-${task.id}`}>Tag</label>
+                      <label htmlFor={`edit-tag-${task.id}`}>Tag(s)</label>
                       <input
                         id={`edit-tag-${task.id}`}
                         value={editDraft.tag}
@@ -372,7 +381,7 @@ export function App() {
                         }
                       />
                     </div>
-                    <button type="button" onClick={saveEdit}>
+                    <button type="button" onClick={saveEditing}>
                       Save Changes
                     </button>
                     <button type="button" onClick={cancelEditing}>
@@ -385,7 +394,7 @@ export function App() {
                     {task.details ? <p>{task.details}</p> : null}
                     {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
                     {task.priority ? <p>Priority: {task.priority}</p> : null}
-                    {task.tag ? <p>Tag: {task.tag}</p> : null}
+                    {task.tags?.length ? <p>Tags: {task.tags.join(', ')}</p> : null}
                     <button type="button" onClick={() => startEditing(task)}>
                       Edit Task
                     </button>
