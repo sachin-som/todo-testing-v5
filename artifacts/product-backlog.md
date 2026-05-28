@@ -126,9 +126,9 @@
 **So that** I understand where my task data is stored.
 
 **Acceptance Criteria (Given/When/Then)**
-1. **Given** first-time app usage or no recorded acknowledgment, **when** I enter the app, **then** a privacy notice is shown before regular task interaction.
-2. **Given** the privacy notice is displayed, **when** I explicitly acknowledge it, **then** acknowledgment is persisted and I can proceed to the main task experience.
-3. **Given** a newer notice version is available than the stored acknowledgment version, **when** I next open the app, **then** I am required to acknowledge the updated notice again.
+1. **Given** first-time app usage or no recorded acknowledgment, **when** I enter the app, **then** a blocking privacy notice is shown before regular task interaction.
+2. **Given** the privacy notice is displayed, **when** I explicitly acknowledge it, **then** acknowledgment is persisted locally and I can proceed to the main task experience.
+3. **Given** a newer notice version is available than the stored acknowledgment version, **when** I next open the app, **then** I am required to acknowledge the updated notice again before using task features.
 
 ---
 
@@ -145,9 +145,8 @@
 ---
 
 ## Prioritization (Suggested)
-- **P0 (Sprint 1):** 1.1, 1.2, 1.3, 1.4, 3.1
-- **P1 (Sprint 2):** 2.1, 2.2, 2.3, 2.4
-- **P1 (Sprint 3):** 3.2, 3.3
+- **P0 (Sprint 1):** 1.1, 1.2, 1.3, 1.4, 3.1, 3.2
+- **P1 (Sprint 2):** 2.1, 2.2, 2.3, 2.4, 3.3
 
 ## Dependencies
 - Story 2.2 depends on Story 1.3 (status toggling).
