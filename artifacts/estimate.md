@@ -1,328 +1,333 @@
-# Estimate Report
+# Estimate Summary
 
 ## Method
-T-Shirt Sizes (calibrated against the sprint plan story-point guidance)
+Story Points (Fibonacci)
 
 ## Consensus Table
 | Story ID | Title | Estimate | Confidence | Risk | Key Factors |
 |----------|-------|----------|------------|------|-------------|
-| US-001 | Create a Task from Main Screen | S | High | Low | Standard CRUD, validation, local persistence, clear AC |
-| US-002 | View Active and Completed Tasks | S | High | Low | Basic list rendering, empty state, storage recovery path |
-| US-003 | Edit an Existing Task | S | Medium | Medium | CRUD update flow, inline validation, rapid-save consistency |
-| US-004 | Toggle Task Completion Status | XS | High | Low | Simple state transition, low scope, deterministic final state |
-| US-005 | Delete a Task with Confirmation | S | High | Low | Confirmation UX, permanent delete, straightforward persistence |
-| US-006 | Persist Tasks Across Refresh and Reopen | M | Medium | Medium | Hydration/recovery, local storage failure handling, core reliability path |
-| US-007 | Present Privacy Notice and Capture Consent Record | S | Medium | Medium | First-run gate, consent persistence, legal/UX dependency |
-| US-008 | Enforce No Remote Task Content Transfer | S | Medium | Medium | Security/privacy validation, telemetry redaction constraints |
-| US-009 | Filter Tasks by Status | S | High | Low | Simple projection/filtering, limited dependency risk |
-| US-010 | Sort Tasks by Due Date and Priority | M | Medium | Medium | Deterministic sort rules, null due date rule unresolved |
-| US-011 | Assign and Edit Tags on Tasks | M | Medium | Medium | Tag normalization, edit interaction, validation constraints |
-| US-012 | Filter Tasks by Tag | S | Medium | Medium | Depends on tag model, combined filter precedence ambiguity |
-| US-013 | Render Due Date in Local Timezone | S | Medium | Medium | Date conversion edge cases, timezone/DST regression risk |
-| US-014 | Accessibility Compliance for Core Flows | M | Medium | Medium | Cross-cutting UI/QA effort, WCAG coverage, test hardening |
-| US-015 | Input Sanitization and Dependency Security Gate | S | Medium | Medium | Security controls, CI gate integration, dependency scan setup |
-| US-016 | Define KPI Instrumentation and Baseline Plan (Spike) | M | Low | High | Spike/discovery work, unknown analytics platform, open KPIs |
+| US-001 | Create a Task from Main Screen | 5 SP | High | Medium | Required validation, local persistence, optional fields, immediate refresh |
+| US-002 | View Active and Completed Tasks | 3 SP | High | Low | Simple projection, empty state, recoverable storage error handling |
+| US-003 | Edit an Existing Task | 5 SP | Medium | Medium | Stale-save handling, validation, deterministic final state under rapid edits |
+| US-004 | Toggle Task Completion Status | 2 SP | High | Low | Small state transition, but needs final-state consistency on rapid toggles |
+| US-005 | Delete a Task with Confirmation | 3 SP | High | Medium | Confirmation flow, permanent delete, safe warning copy |
+| US-006 | Persist Tasks Across Refresh and Reopen | 8 SP | Medium | High | Hydration path, corruption/unavailable storage handling, degraded mode |
+| US-007 | Present Privacy Notice and Capture Consent Record | 3 SP | High | Medium | First-run gate, local consent record, versioned re-acknowledgment |
+| US-008 | Enforce No Remote Task Content Transfer | 5 SP | Medium | High | Privacy enforcement, telemetry exclusions, inspection/verification effort |
+| US-009 | Filter Tasks by Status | 2 SP | High | Low | Straightforward query logic and UI state |
+| US-010 | Sort Tasks by Due Date and Priority | 5 SP | Medium | Medium | Deterministic ordering, null due date rule, tie-break behavior |
+| US-011 | Assign and Edit Tags on Tasks | 5 SP | Medium | Medium | Normalization rules, edit persistence, UI/QA permutations |
+| US-012 | Filter Tasks by Tag | 3 SP | High | Low | Reuses query engine patterns; filtered empty-state handling |
+| US-013 | Render Due Date in Local Timezone | 5 SP | Medium | Medium | Timezone conversion, DST/browser differences, deterministic formatting |
+| US-014 | Accessibility Compliance for Core Flows | 8 SP | Medium | High | Cross-cutting a11y work across create/edit/delete/toggle flows |
+| US-015 | Input Sanitization and Dependency Security Gate | 5 SP | Medium | High | Rendering safety, dependency scan integration, release gating |
+| US-016 | Define KPI Instrumentation and Baseline Plan (Spike) | 3 SP | Low | High | Discovery spike with uncertain telemetry/privacy constraints |
 
 ## Multi-Role Poker Table
 
 ### US-001: Create a Task from Main Screen
-**Consensus:** S | **Confidence:** High | **Risk:** Low
+**Consensus:** 5 SP | **Confidence:** High | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Standard create form, validation, and local write-through persistence |
-| QA | S | Straightforward happy path and validation checks |
-| Architect | S | Fits existing command/repository pattern with no novel design |
-| PO | S | Matches the sprint-plan guidance and core MVP scope |
+| Developer | 5 | Form handling, validation, storage write, and list refresh are standard but integrated |
+| QA | 3 | Mostly normal-path testing, plus validation edge cases |
+| Architect | 5 | Fits existing local-storage and state-manager patterns |
+| PO | 5 | Comparable to core create flow with optional fields and fast feedback |
 
 **Complexity Breakdown:**
-- Technical: Low — conventional CRUD pattern
-- Domain: Low — clear business rule set
-- Dependencies: Low — Browser local storage only
-- Uncertainty: Low — well-defined acceptance criteria
-- Testing: Medium — validation and persistence coverage
-- Data: Low — simple task record shape
+- Technical: Medium — form, validation, persistence, rerender
+- Domain: Low — familiar CRUD behavior
+- Dependencies: Low — local-only storage
+- Uncertainty: Low — clear acceptance criteria
+- Testing: Medium — validation and persistence checks
+- Data: Low — simple task record creation
 
 ### US-002: View Active and Completed Tasks
-**Consensus:** S | **Confidence:** High | **Risk:** Low
+**Consensus:** 3 SP | **Confidence:** High | **Risk:** Low
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | List rendering and state separation are routine |
-| QA | S | UI states are finite: empty, active, completed, storage failure |
-| Architect | S | Projection logic is simple and already modeled |
-| PO | S | Essential core visibility feature, not complex in scope |
+| Developer | 3 | List rendering and state distinction are straightforward |
+| QA | 2 | Main cases are display states and storage error path |
+| Architect | 3 | Uses existing projection/hydration structure |
+| PO | 3 | Low surface-area story with clear user value |
 
 **Complexity Breakdown:**
 - Technical: Low
 - Domain: Low
-- Dependencies: Low to Medium — relies on persisted records
+- Dependencies: Low to Medium — depends on persisted data and hydration path
 - Uncertainty: Low
-- Testing: Medium — empty/error states need coverage
+- Testing: Medium — empty/error states
 - Data: Low
 
 ### US-003: Edit an Existing Task
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Similar to create, but with patching and version handling |
-| QA | S | Editing edge cases and rapid-save behavior need testing |
-| Architect | M | Optimistic consistency and final-state determinism add care |
-| PO | S | Still a standard CRUD capability, but slightly more involved |
+| Developer | 5 | Similar to create, but with patching and conflict-safe final state |
+| QA | 5 | Need tests for validation, stale edits, and rapid repeated saves |
+| Architect | 5 | Versioned update flow adds a modest coordination layer |
+| PO | 3 | Looks simple from UX, but hidden edge cases justify higher size |
 
 **Complexity Breakdown:**
-- Technical: Medium — update path plus final-state correctness
+- Technical: Medium
 - Domain: Low
-- Dependencies: Low
-- Uncertainty: Medium — inline/modal UX not fixed
-- Testing: Medium to High — rapid repeated edits
-- Data: Low
+- Dependencies: Medium — depends on create/view persistence state
+- Uncertainty: Medium — rapid edits and final-state behavior
+- Testing: Medium to High
+- Data: Low to Medium — patching existing records
 
 ### US-004: Toggle Task Completion Status
-**Consensus:** XS | **Confidence:** High | **Risk:** Low
+**Consensus:** 2 SP | **Confidence:** High | **Risk:** Low
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | XS | One state transition and UI update |
-| QA | XS | Easy to validate active/completed transitions |
-| Architect | XS | Minimal surface area with existing data model |
-| PO | XS | Smallest core workflow item |
+| Developer | 2 | Small status update with minimal UI change |
+| QA | 2 | Easy to verify active/completed transitions |
+| Architect | 2 | Reuses state transition mechanics |
+| PO | 2 | Narrow but important interaction |
 
 **Complexity Breakdown:**
 - Technical: Low
 - Domain: Low
-- Dependencies: Low
+- Dependencies: Medium — relies on existing task row/state
 - Uncertainty: Low
 - Testing: Low to Medium
 - Data: Low
 
 ### US-005: Delete a Task with Confirmation
-**Consensus:** S | **Confidence:** High | **Risk:** Low
+**Consensus:** 3 SP | **Confidence:** High | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Confirmation dialog plus permanent removal logic |
-| QA | S | Confirmation/cancel paths are bounded and testable |
-| Architect | S | Reuses existing repository/delete pattern |
-| PO | S | Clear user value with modest implementation effort |
-
-**Complexity Breakdown:**
-- Technical: Low
-- Domain: Low
-- Dependencies: Low
-- Uncertainty: Low
-- Testing: Medium — confirm/cancel and permanence checks
-- Data: Low
-
-### US-006: Persist Tasks Across Refresh and Reopen
-**Consensus:** M | **Confidence:** Medium | **Risk:** Medium
-
-| Role | Estimate | Rationale |
-|------|----------|-----------|
-| Developer | M | Hydration, serialization, and failure recovery add real depth |
-| QA | M | Needs browser/storage failure scenarios and refresh coverage |
-| Architect | M | Core reliability path with versioned envelope handling |
-| PO | M | Critical MVP story, slightly larger than basic CRUD |
-
-**Complexity Breakdown:**
-- Technical: Medium to High — hydration and corruption handling
-- Domain: Low
-- Dependencies: Medium — local storage behavior variability
-- Uncertainty: Medium — recovery mode details matter
-- Testing: High — refresh/reopen, unavailable/corrupt storage
-- Data: Medium — whole dataset persistence
-
-### US-007: Present Privacy Notice and Capture Consent Record
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
-
-| Role | Estimate | Rationale |
-|------|----------|-----------|
-| Developer | S | Modal gate plus local consent storage is manageable |
-| QA | S | First-run and version-change flows are finite |
-| Architect | S | Fits consent manager pattern cleanly |
-| PO | S | Compliance-critical but not a huge build |
+| Developer | 3 | Confirmation modal plus permanent delete action |
+| QA | 3 | Need cancel/confirm and permanence checks |
+| Architect | 3 | Straightforward command with destructive semantics |
+| PO | 3 | Small scope but high user impact if wrong |
 
 **Complexity Breakdown:**
 - Technical: Low to Medium
-- Domain: Medium — legal/privacy copy dependency
-- Dependencies: Medium — legal/UX approval
-- Uncertainty: Medium
+- Domain: Low
+- Dependencies: Medium — needs task selection and persistence
+- Uncertainty: Low
+- Testing: Medium — destructive flow coverage
+- Data: Low
+
+### US-006: Persist Tasks Across Refresh and Reopen
+**Consensus:** 8 SP | **Confidence:** Medium | **Risk:** High
+
+| Role | Estimate | Rationale |
+|------|----------|-----------|
+| Developer | 8 | Hydration, serialization, corruption handling, and fallback mode add complexity |
+| QA | 8 | Requires browser restart, refresh, unavailable storage, and corruption scenarios |
+| Architect | 8 | Core durability path with recovery semantics and versioned envelopes |
+| PO | 5 | User-facing concept is simple, but the reliability work is substantial |
+
+**Complexity Breakdown:**
+- Technical: High — hydration and persistence reliability path
+- Domain: Medium
+- Dependencies: High — browser storage behavior and envelope format
+- Uncertainty: Medium to High — corruption/unavailable storage edge cases
+- Testing: High
+- Data: Medium — persisted dataset lifecycle
+
+### US-007: Present Privacy Notice and Capture Consent Record
+**Consensus:** 3 SP | **Confidence:** High | **Risk:** Medium
+
+| Role | Estimate | Rationale |
+|------|----------|-----------|
+| Developer | 3 | First-run gate plus local consent write is narrow in scope |
+| QA | 3 | Mostly versioning and repeat-visit behavior |
+| Architect | 3 | Fits consent manager pattern cleanly |
+| PO | 3 | Compliance-driven but implementation remains contained |
+
+**Complexity Breakdown:**
+- Technical: Low to Medium
+- Domain: Low
+- Dependencies: Medium — depends on persistence and notice versioning
+- Uncertainty: Low
 - Testing: Medium
 - Data: Low
 
 ### US-008: Enforce No Remote Task Content Transfer
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** High
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Mostly policy enforcement and payload redaction checks |
-| QA | S | Requires network inspection and telemetry validation |
-| Architect | S | Constraint is clear, implementation is straightforward but sensitive |
-| PO | S | Privacy requirement is essential, but scoped narrowly |
+| Developer | 5 | Requires code review, telemetry discipline, and payload exclusions |
+| QA | 5 | Verification via network inspection and telemetry checks is non-trivial |
+| Architect | 5 | Privacy guarantees cut across app boundaries and observability |
+| PO | 3 | Business requirement is clear, but proving compliance adds effort |
 
 **Complexity Breakdown:**
-- Technical: Medium — ensure no task content leaks
-- Domain: Low
-- Dependencies: Medium — telemetry behavior and review
+- Technical: Medium
+- Domain: Medium
+- Dependencies: High — touches telemetry and privacy notice flow
 - Uncertainty: Medium
-- Testing: Medium to High — verification is non-trivial
+- Testing: High — network inspection and regression proof
 - Data: Low
 
 ### US-009: Filter Tasks by Status
-**Consensus:** S | **Confidence:** High | **Risk:** Low
+**Consensus:** 2 SP | **Confidence:** High | **Risk:** Low
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Simple projection over existing task state |
-| QA | S | Three filter states and clear expected outputs |
-| Architect | S | Straightforward query engine behavior |
-| PO | S | Basic organizational affordance with limited scope |
+| Developer | 2 | Basic filter projection on existing state |
+| QA | 2 | Small matrix of statuses and empty states |
+| Architect | 2 | Simple query path reusing projection engine |
+| PO | 2 | Clear and low-risk enhancement |
 
 **Complexity Breakdown:**
 - Technical: Low
 - Domain: Low
 - Dependencies: Low
 - Uncertainty: Low
-- Testing: Low to Medium
+- Testing: Low
 - Data: Low
 
 ### US-010: Sort Tasks by Due Date and Priority
-**Consensus:** M | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | M | Two sort modes plus null due-date rule and tie-breaking |
-| QA | M | Combinatorial ordering cases and edge conditions |
-| Architect | M | Deterministic comparator rules need discipline |
-| PO | M | User-visible but rule-dependent and a bit ambiguous |
+| Developer | 5 | Multiple sort rules and deterministic tie-breaks |
+| QA | 5 | Needs coverage for missing due dates and ordering rules |
+| Architect | 5 | Comparator logic and stable projections are moderately tricky |
+| PO | 3 | Appears simple, but product decisions make it less trivial |
 
 **Complexity Breakdown:**
 - Technical: Medium
-- Domain: Medium — null due-date policy unresolved
-- Dependencies: Medium — product rule confirmation needed
+- Domain: Medium
+- Dependencies: Medium — null due date rule needs confirmation
 - Uncertainty: Medium
-- Testing: High — ordering matrix and DST-adjacent cases
+- Testing: Medium to High
 - Data: Low
 
 ### US-011: Assign and Edit Tags on Tasks
-**Consensus:** M | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | M | Tag normalization, edit UX, and persistence updates |
-| QA | M | Multiple tag variants and normalization rules to verify |
-| Architect | M | Data model and query impacts extend beyond simple CRUD |
-| PO | M | Useful enhancement with moderate complexity |
+| Developer | 5 | Tag normalization, edit behavior, and display rules add breadth |
+| QA | 5 | Requires normalization and duplicate-tag scenarios |
+| Architect | 5 | Reuses task persistence but expands validation and query surface |
+| PO | 3 | Useful feature, but implementation scope is broader than it first appears |
 
 **Complexity Breakdown:**
 - Technical: Medium
-- Domain: Medium — normalization rules matter
-- Dependencies: Medium
+- Domain: Medium
+- Dependencies: Medium — depends on edit flow and data model
 - Uncertainty: Medium
-- Testing: Medium to High — duplicate/limit behavior
-- Data: Medium — list-based tag field handling
+- Testing: Medium
+- Data: Medium — tag uniqueness/normalization
 
 ### US-012: Filter Tasks by Tag
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 3 SP | **Confidence:** High | **Risk:** Low
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Once tags exist, tag filtering is a small query addition |
-| QA | S | Mostly projection behavior plus empty filtered state |
-| Architect | S | Depends on tag indexing/model already in place |
-| PO | S | Clear enhancement but not structurally large |
+| Developer | 3 | Reuses query infrastructure with one extra criterion |
+| QA | 3 | Moderate matrix across tags and empty filtered state |
+| Architect | 3 | Deterministic filter interaction is straightforward |
+| PO | 2 | Narrow enhancement, mostly dependent on tags existing |
 
 **Complexity Breakdown:**
 - Technical: Low to Medium
-- Domain: Medium — combined filter precedence needs definition
-- Dependencies: Medium — depends on US-011
-- Uncertainty: Medium
+- Domain: Low
+- Dependencies: Medium — depends on tag data model
+- Uncertainty: Low
 - Testing: Medium
 - Data: Low
 
 ### US-013: Render Due Date in Local Timezone
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** Medium
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Date formatting is known, but DST/local clock edge cases add work |
-| QA | S | Timezone matrix and regression checks are needed |
-| Architect | S | Clear adapter boundary, but correctness matters |
-| PO | S | Small functional scope with potentially tricky correctness |
+| Developer | 5 | UTC storage, local rendering, and DST handling need careful implementation |
+| QA | 5 | Timezone transitions and browser locale variations expand test cases |
+| Architect | 5 | Requires clear adapter boundaries to avoid ambiguity |
+| PO | 3 | Seems UI-only, but date correctness makes it more involved |
 
 **Complexity Breakdown:**
 - Technical: Medium
-- Domain: Low
-- Dependencies: Medium — browser date/time APIs
+- Domain: Medium
+- Dependencies: Medium — depends on sort/date data model
 - Uncertainty: Medium
-- Testing: High — timezone/DST cases
+- Testing: High — timezone and DST variance
 - Data: Low
 
 ### US-014: Accessibility Compliance for Core Flows
-**Consensus:** M | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 8 SP | **Confidence:** Medium | **Risk:** High
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | M | Requires refactoring controls, labels, and keyboard support |
-| QA | M | Accessibility verification can be time-consuming and iterative |
-| Architect | M | Cross-cutting concern across multiple flows |
-| PO | M | Launch-critical but not a single narrow feature |
+| Developer | 8 | Cross-cutting UI refactor, semantics, focus management, and error states |
+| QA | 8 | Requires keyboard, screen reader, and contrast validation across flows |
+| Architect | 8 | A11y touches multiple components and cannot be bolted on cheaply |
+| PO | 5 | Important quality gate, but easy to underestimate breadth |
 
 **Complexity Breakdown:**
-- Technical: Medium to High — pervasive UI changes
-- Domain: Low
-- Dependencies: Medium — design system and QA support
+- Technical: High
+- Domain: Medium
+- Dependencies: High — spans create/edit/delete/toggle flows
 - Uncertainty: Medium
-- Testing: High — WCAG and assistive-tech checks
+- Testing: High
 - Data: Low
 
 ### US-015: Input Sanitization and Dependency Security Gate
-**Consensus:** S | **Confidence:** Medium | **Risk:** Medium
+**Consensus:** 5 SP | **Confidence:** Medium | **Risk:** High
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | S | Sanitization and CI gate integration are bounded but important |
-| QA | S | Security checks are discrete and automatable |
-| Architect | S | Fits existing validation/security pipeline cleanly |
-| PO | S | Necessary release gate, modest build size |
+| Developer | 5 | Sanitization and security checks require attention to render paths and CI gate setup |
+| QA | 5 | Must validate XSS resistance and release-blocking scan behavior |
+| Architect | 5 | Security control is a release-quality concern across the stack |
+| PO | 3 | Requirement is straightforward, but governance and tooling add effort |
 
 **Complexity Breakdown:**
 - Technical: Medium
 - Domain: Low
-- Dependencies: Medium — scan toolchain and reviewer availability
+- Dependencies: High — CI/security tooling and release process
 - Uncertainty: Medium
-- Testing: Medium
+- Testing: High
 - Data: Low
 
 ### US-016: Define KPI Instrumentation and Baseline Plan (Spike)
-**Consensus:** M | **Confidence:** Low | **Risk:** High
+**Consensus:** 3 SP | **Confidence:** Low | **Risk:** High
 
 | Role | Estimate | Rationale |
 |------|----------|-----------|
-| Developer | M | Discovery work likely spans event design and constraints |
-| QA | M | Validation depends on whatever telemetry plan emerges |
-| Architect | M | Spike spans product, privacy, and platform decisions |
-| PO | M | Unknowns are high, so a timeboxed medium spike is appropriate |
+| Developer | 3 | Discovery work, likely bounded by research and documentation |
+| QA | 2 | Limited implementation, more about validating assumptions |
+| Architect | 3 | Spike to clarify telemetry/privacy constraints and baseline approach |
+| PO | 3 | Planning story with uncertain downstream follow-up |
 
 **Complexity Breakdown:**
 - Technical: Medium
-- Domain: High — KPI definitions and baseline decisions unresolved
-- Dependencies: High — analytics platform and privacy review
+- Domain: Medium
+- Dependencies: High — analytics and legal/privacy decisions
 - Uncertainty: High
 - Testing: Medium
-- Data: Medium — event taxonomy and baseline capture plan
+- Data: Medium
 
 ## Aggregate Summary
-- **Total:** 4 XS, 9 S, 3 M
-- **Overall confidence:** Medium
-- **Top risks:**
-  - US-006 storage hydration/corruption recovery
-  - US-010 null due-date sorting rule ambiguity
-  - US-014 accessibility scope and regression effort
-  - US-016 analytics/KPI spike uncertainty
-- **Recommendations:**
-  - Confirm null due-date sort rule before implementation.
-  - Treat US-006 and US-014 as early-risk stories due to cross-cutting impact.
-  - Keep US-016 timeboxed as a spike and split follow-on work if needed.
-  - Calibrate future estimates with actuals from the sprint plan.
+- Total: 77 points
+- Overall confidence: Medium
+- Top risks:
+  - US-006 persistence/hydration reliability and corruption handling
+  - US-014 accessibility across multiple core flows
+  - US-008 privacy enforcement proof and telemetry discipline
+  - US-015 security tooling and release gating
+- Recommendations:
+  - Keep US-006 as a focused slice if possible; consider splitting hydration from corruption recovery if the team wants lower risk
+  - Treat US-014 as a cross-cutting quality epic, not a last-minute polish task
+  - Confirm the null due-date sort rule before committing to US-010
+  - Preserve spike outcomes from US-016 to avoid hidden follow-up work
+
+## Notes
+- Estimates are uncalibrated; no historical velocity file was provided.
+- Story sizes reflect the local-first, browser-storage architecture and the cross-cutting compliance/security/a11y requirements.
+- Spikes and quality gates were sized with the likely follow-up implementation effort in mind, not just documentation time.
