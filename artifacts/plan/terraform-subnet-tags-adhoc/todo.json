@@ -1,0 +1,5 @@
+[
+  {"id":"1","title":"Remove unsupported tags from azurerm_subnet resource","status":"completed"},
+  {"id":"2","title":"Review Terraform file for consistency","status":"completed"},
+  {"id":"3","title":"Run Terraform validate (if available) or note limitation","status":"completed"}
+]
