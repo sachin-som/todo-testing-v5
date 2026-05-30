@@ -1,0 +1,5 @@
+[
+  {"id":"task-1","title":"Scaffold Terraform layout and provider configuration","status":"completed"},
+  {"id":"task-2","title":"Implement resource group, VNet, and subnets with tags","status":"completed"},
+  {"id":"task-3","title":"Add dev/prod tfvars and outputs","status":"completed"}
+]
