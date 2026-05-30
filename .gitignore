@@ -13,6 +13,11 @@ node_modules
 dist
 coverage
 
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
 # Env
 .env
 .env.*
