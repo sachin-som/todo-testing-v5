@@ -34,7 +34,12 @@
 - **Post-MVP Stories:** 5
 - **Key Themes:** Core task lifecycle, local persistence/privacy, organization and date handling, quality/compliance readiness, observability and launch controls.
 
-### 4. Epics & User Stories
+### 4. Infrastructure Track (Reference Only)
+- Infrastructure provisioning is managed separately from the product backlog.
+- Source of truth: `/workspace/artifacts/infra-blueprint.md`.
+- No infra stories are included here; track infra work in the infra backlog/plan.
+
+### 5. Epics & User Stories
 
 ## Epic: Core Task Lifecycle
 Theme: Personal Productivity Core
