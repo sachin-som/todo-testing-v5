@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [fmt_validate]
-    if: ${{ (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && secrets.ARM_CLIENT_ID != '' && secrets.ARM_CLIENT_SECRET != '' && secrets.ARM_TENANT_ID != '' && secrets.ARM_SUBSCRIPTION_ID != '' }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
     strategy:
       matrix:
         include:
@@ -75,18 +75,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Azure credentials
+        id: azure-creds
+        run: |
+          missing=false
+          for var in ARM_CLIENT_ID ARM_CLIENT_SECRET ARM_TENANT_ID ARM_SUBSCRIPTION_ID; do
+            if [ -z "${!var}" ]; then
+              missing=true
+              echo "- Missing $var" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo "missing=$missing" >> "$GITHUB_OUTPUT"
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      - name: Skip plan (missing Azure credentials)
+        if: ${{ steps.azure-creds.outputs.missing == 'true' }}
+        run: |
+          echo "Azure credentials are missing. Skipping Terraform plan." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Read Terraform version
+        if: ${{ steps.azure-creds.outputs.missing == 'false' }}
         id: tf-version
         run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Terraform
+        if: ${{ steps.azure-creds.outputs.missing == 'false' }}
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ steps.tf-version.outputs.version }}
           terraform_wrapper: false
 
       - name: Terraform init (no backend)
+        if: ${{ steps.azure-creds.outputs.missing == 'false' }}
         run: terraform init -backend=false
 
       - name: Terraform plan
+        if: ${{ steps.azure-creds.outputs.missing == 'false' }}
         run: terraform plan -var-file=${{ matrix.var_file }} -no-color
