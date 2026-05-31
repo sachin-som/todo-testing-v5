@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [fmt_validate]
-    if: ${{ (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && secrets.ARM_CLIENT_ID != '' && secrets.ARM_CLIENT_SECRET != '' && secrets.ARM_TENANT_ID != '' && secrets.ARM_SUBSCRIPTION_ID != '' }}
+    if: ${{ (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && env.ARM_CLIENT_ID != '' && env.ARM_CLIENT_SECRET != '' && env.ARM_TENANT_ID != '' && env.ARM_SUBSCRIPTION_ID != '' }}
     strategy:
       matrix:
         include:
