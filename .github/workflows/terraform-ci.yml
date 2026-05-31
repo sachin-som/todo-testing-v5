@@ -11,6 +11,7 @@ on:
     paths:
       - "infra/terraform/**"
       - ".github/workflows/terraform-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -48,6 +49,18 @@ jobs:
 
       - name: Terraform validate
         run: terraform validate -no-color
+
+      - name: Diagnostics (failure)
+        if: failure()
+        run: |
+          echo "=== Working directory ==="
+          pwd
+          echo "=== Repo root ==="
+          ls -la "$GITHUB_WORKSPACE"
+          echo "=== Terraform dir ==="
+          ls -la
+          echo "=== Terraform version ==="
+          terraform version || true
 
   plan:
     name: Terraform Plan
@@ -90,3 +103,15 @@ jobs:
 
       - name: Terraform plan
         run: terraform plan -var-file=${{ matrix.var_file }} -no-color
+
+      - name: Diagnostics (failure)
+        if: failure()
+        run: |
+          echo "=== Working directory ==="
+          pwd
+          echo "=== Repo root ==="
+          ls -la "$GITHUB_WORKSPACE"
+          echo "=== Terraform dir ==="
+          ls -la
+          echo "=== Terraform version ==="
+          terraform version || true
