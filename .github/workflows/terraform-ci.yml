@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [fmt_validate]
-    if: ${{ (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && env.ARM_CLIENT_ID != '' && env.ARM_CLIENT_SECRET != '' && env.ARM_TENANT_ID != '' && env.ARM_SUBSCRIPTION_ID != '' }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     strategy:
       matrix:
         include:
@@ -98,10 +98,22 @@ jobs:
           terraform_version: ${{ steps.tf-version.outputs.version }}
           terraform_wrapper: false
 
+      - name: Check ARM credentials
+        id: arm-check
+        run: |
+          if [ -n "$ARM_CLIENT_ID" ] && [ -n "$ARM_CLIENT_SECRET" ] && [ -n "$ARM_TENANT_ID" ] && [ -n "$ARM_SUBSCRIPTION_ID" ]; then
+            echo "has_secrets=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_secrets=false" >> "$GITHUB_OUTPUT"
+            echo "Missing ARM secrets; skipping terraform plan." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Terraform init (no backend)
+        if: ${{ steps.arm-check.outputs.has_secrets == 'true' }}
         run: terraform init -backend=false
 
       - name: Terraform plan
+        if: ${{ steps.arm-check.outputs.has_secrets == 'true' }}
         run: terraform plan -var-file=${{ matrix.var_file }} -no-color
 
       - name: Diagnostics (failure)
