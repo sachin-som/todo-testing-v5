@@ -43,6 +43,7 @@ export function App() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<EditDraft | null>(null)
   const [editTitleError, setEditTitleError] = useState('')
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
 
   const activeTasks = useMemo(
     () => tasks.filter((task) => task.status === 'active'),
@@ -153,8 +154,27 @@ export function App() {
     setEditTitleError('')
   }
 
+  const requestDelete = (taskId: string) => {
+    setDeleteTargetId(taskId)
+  }
+
+  const cancelDelete = () => {
+    setDeleteTargetId(null)
+  }
+
+  const confirmDelete = (taskId: string) => {
+    let latestTasks: Task[] = []
+    setTasks((prevTasks) => {
+      latestTasks = prevTasks.filter((task) => task.id !== taskId)
+      return latestTasks
+    })
+    persistTasks(latestTasks)
+    setDeleteTargetId(null)
+  }
+
   const renderTask = (task: Task, isCompletedSection: boolean) => {
     const isEditing = editingTaskId === task.id && editDraft !== null
+    const isDeleting = deleteTargetId === task.id
 
     return (
       <li
@@ -230,23 +250,42 @@ export function App() {
             {task.dueDate ? <p>Due: {task.dueDate}</p> : null}
             {task.priority ? <p>Priority: {task.priority}</p> : null}
             {task.tag ? <p>Tag: {task.tag}</p> : null}
-            <button type="button" onClick={() => startEditing(task)}>
-              Edit Task
-            </button>
-            {isCompletedSection ? (
-              <button
-                type="button"
-                onClick={() => updateTaskStatus(task.id, 'active')}
-              >
-                Mark Active
-              </button>
+            {isDeleting ? (
+              <>
+                <p role="alert" className="delete-warning">
+                  Deleting a task is permanent and cannot be undone.
+                </p>
+                <button type="button" onClick={() => confirmDelete(task.id)}>
+                  Confirm Delete
+                </button>
+                <button type="button" onClick={cancelDelete}>
+                  Cancel
+                </button>
+              </>
             ) : (
-              <button
-                type="button"
-                onClick={() => updateTaskStatus(task.id, 'completed')}
-              >
-                Mark Complete
-              </button>
+              <>
+                <button type="button" onClick={() => startEditing(task)}>
+                  Edit Task
+                </button>
+                {isCompletedSection ? (
+                  <button
+                    type="button"
+                    onClick={() => updateTaskStatus(task.id, 'active')}
+                  >
+                    Mark Active
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => updateTaskStatus(task.id, 'completed')}
+                  >
+                    Mark Complete
+                  </button>
+                )}
+                <button type="button" onClick={() => requestDelete(task.id)}>
+                  Delete Task
+                </button>
+              </>
             )}
           </>
         )}

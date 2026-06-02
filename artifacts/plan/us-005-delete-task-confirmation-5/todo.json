@@ -1,0 +1,6 @@
+[
+  {"id":"1","title":"Add delete confirmation state and UI warning","status":"completed"},
+  {"id":"2","title":"Implement confirm/cancel delete behavior with storage updates","status":"completed"},
+  {"id":"3","title":"Add tests for delete confirmation flow","status":"completed"},
+  {"id":"4","title":"Run tests/lint (or note limitations)","status":"completed"}
+]
