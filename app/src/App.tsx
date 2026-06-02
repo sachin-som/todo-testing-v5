@@ -163,6 +163,12 @@ export function App() {
   }
 
   const confirmDelete = (taskId: string) => {
+    let latestTasks: Task[] = []
+    setTasks((prevTasks) => {
+      latestTasks = prevTasks.filter((task) => task.id !== taskId)
+      return latestTasks
+    })
+    persistTasks(latestTasks)
     setDeleteTargetId(null)
   }
 
