@@ -341,4 +341,83 @@ describe('Task experience (US-001 + US-002 + US-003 + US-004)', () => {
     const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
     expect(stored[0].status).toBe('completed')
   })
+
+  it('shows delete confirmation warning before removing a task', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Delete me',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const activeList = screen.getByLabelText('active-task-list')
+    const card = within(activeList).getByText('Delete me').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /delete task/i }))
+
+    expect(within(card).getByRole('alert')).toHaveTextContent(
+      'Deleting a task is permanent and cannot be undone.',
+    )
+  })
+
+  it('removes task after delete confirmation and clears storage', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Remove me',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const activeList = screen.getByLabelText('active-task-list')
+    const card = within(activeList).getByText('Remove me').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /delete task/i }))
+    await user.click(within(card).getByRole('button', { name: /confirm delete/i }))
+
+    expect(screen.queryByText('Remove me')).not.toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored).toHaveLength(0)
+  })
+
+  it('keeps task when delete confirmation is canceled', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Keep me',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const activeList = screen.getByLabelText('active-task-list')
+    const card = within(activeList).getByText('Keep me').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /delete task/i }))
+    await user.click(within(card).getByRole('button', { name: /cancel/i }))
+
+    expect(screen.getByText('Keep me')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored).toHaveLength(1)
+  })
 })
