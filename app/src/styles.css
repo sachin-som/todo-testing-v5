@@ -1,65 +1,209 @@
+:root {
+  color-scheme: light;
+  --ink: #141a22;
+  --slate: #4b5563;
+  --mist: #f6f7fa;
+  --snow: #ffffff;
+  --mint: #14b8a6;
+  --mint-deep: #0f766e;
+  --warning: #f59e0b;
+  --success: #16a34a;
+  --error: #ef4444;
+  --border: #e5e7eb;
+  --shadow: 0 8px 20px rgba(16, 24, 40, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;
-  padding: 1rem;
+  background: var(--mist);
+  color: var(--ink);
 }
 
 main {
-  max-width: 760px;
+  max-width: 960px;
   margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+h1,
+h2 {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  margin: 2rem 0 1rem;
+  font-size: 1.25rem;
 }
 
 form {
   display: grid;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--snow);
+  box-shadow: var(--shadow);
+}
+
+form > div {
+  display: grid;
+  gap: 0.35rem;
 }
 
 label {
-  display: block;
+  font-size: 0.85rem;
   font-weight: 600;
+  color: var(--slate);
 }
 
 input,
 textarea,
-select,
+select {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--snow);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--mint);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25);
+}
+
 button {
-  margin-top: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  padding: 0.55rem 1.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: var(--snow);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+    background 0.18s ease, box-shadow 0.18s ease;
+}
+
+button:hover {
+  border-color: #cbd5e1;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button[type='submit'] {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--snow);
+  box-shadow: var(--shadow);
+  justify-self: start;
+}
+
+button[type='submit']:hover {
+  background: var(--mint-deep);
+  border-color: var(--mint-deep);
 }
 
 [role='alert'] {
-  color: #b00020;
+  color: var(--error);
   margin: 0.25rem 0 0;
+  font-size: 0.85rem;
 }
 
 .storage-error {
-  background: #fff4e5;
-  border: 1px solid #f0b429;
-  padding: 0.75rem;
+  margin-top: 1rem;
+  background: #fff7ed;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
 }
 
 .empty-state {
   font-style: italic;
+  color: var(--slate);
+}
+
+section {
+  margin-top: 2rem;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
 }
 
 .task-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  background: var(--snow);
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.06);
+  display: grid;
+  gap: 0.5rem;
 }
 
-.task-active {
-  border-left: 4px solid #2b8a3e;
-}
-
-.task-completed {
-  border-left: 4px solid #6c757d;
-  opacity: 0.85;
+.task-card strong {
+  font-size: 1.05rem;
 }
 
 .task-status {
-  font-size: 0.85rem;
-  margin: 0 0 0.25rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--slate);
+  margin: 0;
+}
+
+.task-active {
+  border-left: 4px solid var(--success);
+}
+
+.task-completed {
+  border-left: 4px solid #94a3b8;
+  opacity: 0.9;
+}
+
+.task-card button {
+  width: fit-content;
+}
+
+@media (min-width: 900px) {
+  form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  form > div:nth-child(1),
+  form > div:nth-child(2) {
+    grid-column: span 2;
+  }
+
+  form > button {
+    grid-column: span 2;
+  }
 }
