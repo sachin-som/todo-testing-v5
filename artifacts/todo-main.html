@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusList — Todo Main</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#141A22",
+            slate: "#4B5563",
+            mist: "#F6F7FA",
+            snow: "#FFFFFF",
+            mint: "#14B8A6",
+            mintDeep: "#0F766E",
+            warning: "#F59E0B",
+            success: "#16A34A",
+            error: "#EF4444",
+            border: "#E5E7EB"
+          },
+          boxShadow: {
+            soft: "0 8px 20px rgba(16, 24, 40, 0.08)"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Manrope", "sans-serif"]
+          },
+          borderRadius: {
+            card: "14px"
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-mist text-ink font-sans">
+  <header class="border-b border-border bg-snow">
+    <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-1.5 rounded-full bg-mint"></div>
+        <div>
+          <p class="font-display text-lg">FocusList</p>
+          <p class="text-xs text-slate">Personal productivity workspace</p>
+        </div>
+      </div>
+      <nav class="flex items-center gap-6 text-sm font-medium text-slate">
+        <a class="border-b-2 border-mint pb-1 text-ink" href="todo-main.html">Todo Main</a>
+        <a class="hover:text-ink" href="index.html">All Screens</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-6xl px-6 py-8">
+    <section class="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+      <div class="space-y-8">
+        <div class="rounded-card border border-border bg-snow p-6 shadow-soft">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 class="font-display text-3xl">Plan today with clarity</h1>
+              <p class="mt-2 max-w-xl text-sm text-slate">Capture every task in under a minute. Prioritize, tag, and finish the day with confidence.</p>
+            </div>
+            <div class="flex items-center gap-3 rounded-full border border-border bg-mist px-4 py-2 text-xs text-slate">
+              <span class="h-2 w-2 rounded-full bg-success"></span>
+              Local storage active
+            </div>
+          </div>
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            <div class="md:col-span-2">
+              <label class="text-xs font-semibold text-slate" for="task-title">Task title</label>
+              <input id="task-title" type="text" placeholder="Write a clear, actionable task..." class="mt-2 w-full rounded-xl border border-border bg-snow px-4 py-3 text-sm focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30" />
+              <p class="mt-2 text-xs text-slate">Title is required. Keep it under 80 characters.</p>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate" for="due-date">Due date</label>
+              <input id="due-date" type="date" class="mt-2 w-full rounded-xl border border-border bg-snow px-4 py-3 text-sm focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30" />
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate" for="priority">Priority</label>
+              <select id="priority" class="mt-2 w-full rounded-xl border border-border bg-snow px-4 py-3 text-sm focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30">
+                <option>Normal</option>
+                <option>High</option>
+                <option>Low</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-xs font-semibold text-slate" for="tags">Tags</label>
+              <input id="tags" type="text" placeholder="e.g. Home, Finance" class="mt-2 w-full rounded-xl border border-border bg-snow px-4 py-3 text-sm focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30" />
+            </div>
+          </div>
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <p class="text-xs text-slate">Your tasks are stored only in this browser.</p>
+            <div class="flex items-center gap-3">
+              <button class="rounded-full border border-border px-5 py-2 text-sm font-semibold text-slate transition hover:border-slate hover:text-ink">Clear</button>
+              <button class="rounded-full bg-mint px-6 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-mintDeep focus:outline-none focus:ring-2 focus:ring-mint/40">Add task</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-2 rounded-full border border-border bg-snow px-2 py-1 text-xs font-semibold text-slate">
+            <button class="rounded-full bg-mist px-3 py-2 text-ink">All</button>
+            <button class="rounded-full px-3 py-2 hover:text-ink">Active</button>
+            <button class="rounded-full px-3 py-2 hover:text-ink">Completed</button>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate">
+            <label class="font-semibold" for="sort">Sort by</label>
+            <select id="sort" class="rounded-full border border-border bg-snow px-4 py-2 text-xs focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30">
+              <option>Due date</option>
+              <option>Priority</option>
+              <option>Created</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="rounded-card border border-border bg-snow p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-warning/20 px-2 py-1 text-xs font-semibold text-warning">Due today</span>
+                  <span class="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-slate">High priority</span>
+                </div>
+                <h3 class="mt-3 font-display text-lg">Pay utility bills and update budget sheet</h3>
+                <p class="mt-1 text-sm text-slate">Tags: Home, Finance</p>
+              </div>
+              <div class="flex flex-col items-end gap-3 text-xs text-slate">
+                <span>Due 5:00 PM</span>
+                <button class="rounded-full border border-border px-3 py-2 font-semibold text-ink transition hover:border-slate">Mark complete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-card border border-border bg-snow p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-slate">Normal</span>
+                  <span class="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-slate">Work</span>
+                </div>
+                <h3 class="mt-3 font-display text-lg">Draft project outline for Monday review</h3>
+                <p class="mt-1 text-sm text-slate">Due tomorrow • Tags: Planning</p>
+              </div>
+              <div class="flex flex-col items-end gap-3 text-xs text-slate">
+                <span>Added 2 hours ago</span>
+                <div class="flex items-center gap-2">
+                  <button class="rounded-full border border-border px-3 py-2 font-semibold text-slate transition hover:text-ink">Edit</button>
+                  <button class="rounded-full border border-border px-3 py-2 font-semibold text-error transition hover:border-error">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-card border border-border bg-snow p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-slate">Low priority</span>
+                  <span class="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-slate">Errands</span>
+                </div>
+                <h3 class="mt-3 font-display text-lg">Pick up book order from local store</h3>
+                <p class="mt-1 text-sm text-slate">No due date • Tags: Personal</p>
+              </div>
+              <div class="flex flex-col items-end gap-3 text-xs text-slate">
+                <span>Added yesterday</span>
+                <button class="rounded-full border border-border px-3 py-2 font-semibold text-ink transition hover:border-slate">Mark complete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-card border border-border bg-snow p-5 shadow-soft">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display text-lg">Completed</h2>
+            <span class="text-xs text-slate">3 tasks</span>
+          </div>
+          <div class="mt-4 space-y-3">
+            <div class="flex items-center justify-between rounded-xl border border-border bg-mist px-4 py-3">
+              <div class="flex items-center gap-3">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-xs font-semibold text-white">✓</span>
+                <div>
+                  <p class="text-sm font-semibold text-ink">Schedule dentist appointment</p>
+                  <p class="text-xs text-slate">Completed yesterday • Health</p>
+                </div>
+              </div>
+              <button class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-slate transition hover:text-ink">Restore</button>
+            </div>
+            <div class="flex items-center justify-between rounded-xl border border-border bg-mist px-4 py-3">
+              <div class="flex items-center gap-3">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-success text-xs font-semibold text-white">✓</span>
+                <div>
+                  <p class="text-sm font-semibold text-ink">Send invoices to clients</p>
+                  <p class="text-xs text-slate">Completed 2 days ago • Finance</p>
+                </div>
+              </div>
+              <button class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-slate transition hover:text-ink">Restore</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="space-y-6">
+        <div class="rounded-card border border-border bg-snow p-6 shadow-soft">
+          <h2 class="font-display text-lg">Today at a glance</h2>
+          <div class="mt-4 grid gap-3">
+            <div class="flex items-center justify-between rounded-xl border border-border bg-mist px-4 py-3">
+              <span class="text-sm font-semibold text-ink">Active tasks</span>
+              <span class="text-lg font-display">7</span>
+            </div>
+            <div class="flex items-center justify-between rounded-xl border border-border bg-mist px-4 py-3">
+              <span class="text-sm font-semibold text-ink">Due today</span>
+              <span class="text-lg font-display">2</span>
+            </div>
+            <div class="flex items-center justify-between rounded-xl border border-border bg-mist px-4 py-3">
+              <span class="text-sm font-semibold text-ink">Completed</span>
+              <span class="text-lg font-display">3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-card border border-border bg-snow p-6 shadow-soft">
+          <h2 class="font-display text-lg">Tag filters</h2>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+            <button class="rounded-full border border-border bg-mist px-3 py-2 text-ink">All tags</button>
+            <button class="rounded-full border border-border px-3 py-2 text-slate hover:text-ink">Finance</button>
+            <button class="rounded-full border border-border px-3 py-2 text-slate hover:text-ink">Work</button>
+            <button class="rounded-full border border-border px-3 py-2 text-slate hover:text-ink">Home</button>
+            <button class="rounded-full border border-border px-3 py-2 text-slate hover:text-ink">Health</button>
+          </div>
+        </div>
+
+        <div class="rounded-card border border-border bg-snow p-6 shadow-soft">
+          <h2 class="font-display text-lg">Local storage notice</h2>
+          <p class="mt-3 text-sm text-slate">Your tasks live only on this device. Clearing browser data will remove them permanently.</p>
+          <div class="mt-4 rounded-xl border border-border bg-mist p-4 text-xs text-slate">
+            <p class="font-semibold text-ink">Privacy</p>
+            <p class="mt-2">No task data is sent to any server in Release 1.</p>
+          </div>
+          <button class="mt-4 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-slate hover:text-ink">View privacy notice</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

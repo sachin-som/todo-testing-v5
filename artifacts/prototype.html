@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Todo Focus Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #141A22;
+      --slate: #4B5563;
+      --mist: #F6F7FA;
+      --snow: #FFFFFF;
+      --accent: #14B8A6;
+      --accent-deep: #0F766E;
+      --warning: #F59E0B;
+      --success: #16A34A;
+      --error: #EF4444;
+      --border: #E5E7EB;
+      --shadow: 0 8px 20px rgba(16, 24, 40, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      color: var(--ink);
+      background: var(--mist);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      background: var(--snow);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .brand {
+      font-family: "Manrope", sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .utility {
+      font-size: 13px;
+      color: var(--slate);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--snow);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .accent-rail {
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .accent-rail::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(20, 184, 166, 0.3);
+    }
+
+    h1 {
+      font-family: "Manrope", sans-serif;
+      font-size: 28px;
+      margin: 0 0 12px;
+    }
+
+    h2 {
+      font-family: "Manrope", sans-serif;
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--slate);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .button {
+      height: 44px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .button:hover {
+      background: var(--accent-deep);
+      box-shadow: 0 8px 18px rgba(20, 184, 166, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .button.secondary {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .button.secondary:hover {
+      background: #F3F4F6;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      cursor: pointer;
+      background: white;
+    }
+
+    .pill.active {
+      background: rgba(20, 184, 166, 0.12);
+      border-color: rgba(20, 184, 166, 0.6);
+      color: var(--accent-deep);
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--slate);
+    }
+
+    .task-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .task-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      background: white;
+      display: grid;
+      gap: 12px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .task-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .status-chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #F9FAFB;
+      color: var(--slate);
+    }
+
+    .status-chip.completed {
+      border-color: rgba(22, 163, 74, 0.4);
+      background: rgba(22, 163, 74, 0.08);
+      color: var(--success);
+    }
+
+    .tag-chip {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #F3F4F6;
+      color: var(--slate);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .link-button {
+      border: none;
+      background: transparent;
+      color: var(--accent-deep);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .warning {
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    .error-text {
+      color: var(--error);
+      font-size: 12px;
+    }
+
+    .notice {
+      background: #F9FAFB;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px dashed var(--border);
+      font-size: 12px;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--slate);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 5;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: var(--shadow);
+    }
+
+    .modal.visible {
+      display: flex;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      header {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Todo Focus Studio</div>
+    <div class="utility">Local-only tasks · No login required</div>
+  </header>
+
+  <main>
+    <div class="layout">
+      <section class="panel accent-rail">
+        <h1>Plan today</h1>
+        <p class="meta">Capture tasks quickly, then refine them with tags and due dates.</p>
+        <form id="create-form" class="form-grid" autocomplete="off">
+          <div>
+            <label for="title">Task title</label>
+            <input id="title" name="title" placeholder="e.g., Draft weekly report" required />
+            <div id="title-error" class="error-text"></div>
+          </div>
+          <div>
+            <label for="due-date">Due date</label>
+            <input id="due-date" name="due-date" type="date" />
+          </div>
+          <div>
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+              <option value="medium" selected>Medium focus</option>
+              <option value="high">High focus</option>
+              <option value="low">Low focus</option>
+            </select>
+          </div>
+          <div>
+            <label for="tags">Tags (comma separated)</label>
+            <input id="tags" name="tags" placeholder="work, errands" />
+          </div>
+          <button class="button" type="submit">Add task</button>
+        </form>
+
+        <div style="margin-top: 24px;">
+          <h2>Filters</h2>
+          <div class="pill-group" id="status-filters"></div>
+          <div style="margin-top: 12px;">
+            <label for="tag-filter">Tag filter</label>
+            <select id="tag-filter"></select>
+          </div>
+          <div style="margin-top: 12px;">
+            <label for="sort-by">Sort by</label>
+            <select id="sort-by">
+              <option value="dueDate">Due date</option>
+              <option value="priority">Priority</option>
+              <option value="updatedAt">Recently updated</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <h2>Summary</h2>
+          <div class="notice">
+            <strong id="summary-counts">0 active · 0 completed</strong><br />
+            Keep tasks under 1,000 for best performance.
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <h2>Privacy</h2>
+          <div class="notice">
+            Your tasks stay on this device only. Clearing browser data will permanently delete them.
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Focus list</h2>
+        <div id="task-list" class="task-list"></div>
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <h2>No tasks yet</h2>
+          <p>Add your first task to start building momentum.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="consent-modal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Privacy notice</h2>
+      <p class="meta">Tasks are stored only in your browser. No accounts, no cloud sync. Clearing browser data deletes tasks permanently.</p>
+      <div class="modal-actions">
+        <button class="button" id="consent-accept">I understand</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Edit task</h2>
+      <form id="edit-form" class="form-grid">
+        <div>
+          <label for="edit-title">Task title</label>
+          <input id="edit-title" required />
+          <div id="edit-title-error" class="error-text"></div>
+        </div>
+        <div>
+          <label for="edit-due">Due date</label>
+          <input id="edit-due" type="date" />
+        </div>
+        <div>
+          <label for="edit-priority">Priority</label>
+          <select id="edit-priority">
+            <option value="high">High focus</option>
+            <option value="medium">Medium focus</option>
+            <option value="low">Low focus</option>
+          </select>
+        </div>
+        <div>
+          <label for="edit-tags">Tags</label>
+          <input id="edit-tags" placeholder="work, errands" />
+        </div>
+        <div class="modal-actions">
+          <button class="button secondary" type="button" id="edit-cancel">Cancel</button>
+          <button class="button" type="submit">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Delete task?</h2>
+      <p class="meta">This action is permanent. The task will be removed from this device.</p>
+      <div class="modal-actions">
+        <button class="button secondary" id="delete-cancel">Keep task</button>
+        <button class="button" id="delete-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "todo.tasks.v1";
+    const CONSENT_KEY = "todo.consent.v1";
+    const NOTICE_VERSION = "1.0";
+
+    const state = {
+      tasks: [],
+      filterStatus: "all",
+      tagFilter: "all",
+      sortBy: "dueDate"
+    };
+
+    const priorityRank = { high: 3, medium: 2, low: 1 };
+
+    const $ = (id) => document.getElementById(id);
+
+    function createId() {
+      if (crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return "task-" + Math.random().toString(36).slice(2, 10);
+    }
+
+    function seedTasks() {
+      return [
+        {
+          id: createId(),
+          title: "Outline product roadmap",
+          dueDateUtc: new Date(Date.now() + 86400000).toISOString(),
+          priority: "high",
+          tags: ["work", "planning"],
+          status: "active",
+          createdAtUtc: new Date().toISOString(),
+          updatedAtUtc: new Date().toISOString()
+        },
+        {
+          id: createId(),
+          title: "Grocery run for the week",
+          dueDateUtc: new Date(Date.now() + 2 * 86400000).toISOString(),
+          priority: "medium",
+          tags: ["errands"],
+          status: "active",
+          createdAtUtc: new Date().toISOString(),
+          updatedAtUtc: new Date().toISOString()
+        },
+        {
+          id: createId(),
+          title: "30-minute stretch session",
+          dueDateUtc: null,
+          priority: "low",
+          tags: ["wellness"],
+          status: "completed",
+          createdAtUtc: new Date().toISOString(),
+          updatedAtUtc: new Date().toISOString()
+        },
+        {
+          id: createId(),
+          title: "Review client feedback",
+          dueDateUtc: new Date(Date.now() + 3 * 86400000).toISOString(),
+          priority: "high",
+          tags: ["work", "review"],
+          status: "active",
+          createdAtUtc: new Date().toISOString(),
+          updatedAtUtc: new Date().toISOString()
+        }
+      ];
+    }
+
+    function loadTasks() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        const seeded = seedTasks();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+        return seeded;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (error) {
+        console.error("Failed to parse tasks", error);
+      }
+      const fallback = seedTasks();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
+      return fallback;
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function loadConsent() {
+      const raw = localStorage.getItem(CONSENT_KEY);
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch (error) {
+        console.error("Failed to parse consent", error);
+      }
+      return null;
+    }
+
+    function saveConsent() {
+      const record = { noticeVersion: NOTICE_VERSION, acknowledgedAtUtc: new Date().toISOString() };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(record));
+    }
+
+    function normalizeTags(input) {
+      if (!input) return [];
+      return input
+        .split(",")
+        .map((tag) => tag.trim().toLowerCase())
+        .filter(Boolean)
+        .filter((tag, index, array) => array.indexOf(tag) === index)
+        .slice(0, 20);
+    }
+
+    function toUtcDate(localDate) {
+      if (!localDate) return null;
+      return new Date(localDate + "T00:00:00").toISOString();
+    }
+
+    function fromUtcDate(utc) {
+      if (!utc) return "";
+      const date = new Date(utc);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatDisplayDate(utc) {
+      if (!utc) return "No due date";
+      return new Date(utc).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function updateSummary() {
+      const active = state.tasks.filter((task) => task.status === "active").length;
+      const completed = state.tasks.filter((task) => task.status === "completed").length;
+      $("summary-counts").textContent = `${active} active · ${completed} completed`;
+    }
+
+    function buildStatusFilters() {
+      const statuses = [
+        { id: "all", label: "All" },
+        { id: "active", label: "Active" },
+        { id: "completed", label: "Completed" }
+      ];
+      const container = $("status-filters");
+      container.innerHTML = "";
+      statuses.forEach((status) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "pill" + (state.filterStatus === status.id ? " active" : "");
+        button.textContent = status.label;
+        button.addEventListener("click", () => {
+          state.filterStatus = status.id;
+          render();
+        });
+        container.appendChild(button);
+      });
+    }
+
+    function buildTagFilter() {
+      const select = $("tag-filter");
+      const tags = new Set();
+      state.tasks.forEach((task) => task.tags.forEach((tag) => tags.add(tag)));
+      const sorted = Array.from(tags).sort();
+      select.innerHTML = "";
+      const allOption = document.createElement("option");
+      allOption.value = "all";
+      allOption.textContent = "All tags";
+      select.appendChild(allOption);
+      sorted.forEach((tag) => {
+        const option = document.createElement("option");
+        option.value = tag;
+        option.textContent = tag;
+        select.appendChild(option);
+      });
+      select.value = state.tagFilter;
+    }
+
+    function projectTasks() {
+      let tasks = [...state.tasks];
+      if (state.filterStatus !== "all") {
+        tasks = tasks.filter((task) => task.status === state.filterStatus);
+      }
+      if (state.tagFilter !== "all") {
+        tasks = tasks.filter((task) => task.tags.includes(state.tagFilter));
+      }
+      tasks.sort((a, b) => {
+        if (state.sortBy === "priority") {
+          return priorityRank[b.priority] - priorityRank[a.priority];
+        }
+        if (state.sortBy === "updatedAt") {
+          return new Date(b.updatedAtUtc) - new Date(a.updatedAtUtc);
+        }
+        const aDate = a.dueDateUtc ? new Date(a.dueDateUtc).getTime() : Infinity;
+        const bDate = b.dueDateUtc ? new Date(b.dueDateUtc).getTime() : Infinity;
+        return aDate - bDate;
+      });
+      return tasks;
+    }
+
+    function renderTasks() {
+      const list = $("task-list");
+      const empty = $("empty-state");
+      list.innerHTML = "";
+      const projected = projectTasks();
+      if (projected.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+      projected.forEach((task) => {
+        const card = document.createElement("div");
+        card.className = "task-card";
+
+        const header = document.createElement("div");
+        header.className = "task-header";
+        const title = document.createElement("h3");
+        title.className = "task-title";
+        title.textContent = task.title;
+        const chip = document.createElement("span");
+        chip.className = "status-chip" + (task.status === "completed" ? " completed" : "");
+        chip.textContent = task.status === "completed" ? "Completed" : "Active";
+        header.appendChild(title);
+        header.appendChild(chip);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        const dueLabel = formatDisplayDate(task.dueDateUtc);
+        const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+        meta.textContent = `${dueLabel} · ${priorityLabel} priority`;
+        if (task.dueDateUtc && new Date(task.dueDateUtc) < new Date()) {
+          meta.innerHTML = `<span class=\"warning\">Overdue</span> · ${priorityLabel} priority`;
+        }
+
+        const tags = document.createElement("div");
+        tags.className = "pill-group";
+        task.tags.forEach((tag) => {
+          const chip = document.createElement("span");
+          chip.className = "tag-chip";
+          chip.textContent = tag;
+          tags.appendChild(chip);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        const toggle = document.createElement("button");
+        toggle.className = "link-button";
+        toggle.textContent = task.status === "completed" ? "Mark active" : "Mark complete";
+        toggle.addEventListener("click", () => toggleStatus(task.id));
+        const edit = document.createElement("button");
+        edit.className = "link-button";
+        edit.textContent = "Edit";
+        edit.addEventListener("click", () => openEdit(task.id));
+        const remove = document.createElement("button");
+        remove.className = "link-button";
+        remove.textContent = "Delete";
+        remove.addEventListener("click", () => openDelete(task.id));
+        actions.append(toggle, edit, remove);
+
+        card.append(header, meta, tags, actions);
+        list.appendChild(card);
+      });
+    }
+
+    function render() {
+      buildStatusFilters();
+      buildTagFilter();
+      updateSummary();
+      renderTasks();
+    }
+
+    function addTask(event) {
+      event.preventDefault();
+      const titleField = $("title");
+      const error = $("title-error");
+      const title = titleField.value.trim();
+      if (!title) {
+        error.textContent = "Title is required.";
+        return;
+      }
+      error.textContent = "";
+      const task = {
+        id: createId(),
+        title,
+        dueDateUtc: toUtcDate($("due-date").value),
+        priority: $("priority").value,
+        tags: normalizeTags($("tags").value),
+        status: "active",
+        createdAtUtc: new Date().toISOString(),
+        updatedAtUtc: new Date().toISOString()
+      };
+      state.tasks.unshift(task);
+      saveTasks(state.tasks);
+      event.target.reset();
+      render();
+    }
+
+    function toggleStatus(id) {
+      state.tasks = state.tasks.map((task) => {
+        if (task.id !== id) return task;
+        const status = task.status === "completed" ? "active" : "completed";
+        return { ...task, status, updatedAtUtc: new Date().toISOString() };
+      });
+      saveTasks(state.tasks);
+      render();
+    }
+
+    let editId = null;
+
+    function openEdit(id) {
+      const task = state.tasks.find((item) => item.id === id);
+      if (!task) return;
+      editId = id;
+      $("edit-title").value = task.title;
+      $("edit-due").value = fromUtcDate(task.dueDateUtc);
+      $("edit-priority").value = task.priority;
+      $("edit-tags").value = task.tags.join(", ");
+      $("edit-title-error").textContent = "";
+      $("edit-modal").classList.add("visible");
+    }
+
+    function closeEdit() {
+      editId = null;
+      $("edit-modal").classList.remove("visible");
+    }
+
+    function saveEdit(event) {
+      event.preventDefault();
+      const title = $("edit-title").value.trim();
+      if (!title) {
+        $("edit-title-error").textContent = "Title is required.";
+        return;
+      }
+      $("edit-title-error").textContent = "";
+      state.tasks = state.tasks.map((task) => {
+        if (task.id !== editId) return task;
+        return {
+          ...task,
+          title,
+          dueDateUtc: toUtcDate($("edit-due").value),
+          priority: $("edit-priority").value,
+          tags: normalizeTags($("edit-tags").value),
+          updatedAtUtc: new Date().toISOString()
+        };
+      });
+      saveTasks(state.tasks);
+      closeEdit();
+      render();
+    }
+
+    let deleteId = null;
+
+    function openDelete(id) {
+      deleteId = id;
+      $("delete-modal").classList.add("visible");
+    }
+
+    function closeDelete() {
+      deleteId = null;
+      $("delete-modal").classList.remove("visible");
+    }
+
+    function confirmDelete() {
+      if (!deleteId) return;
+      state.tasks = state.tasks.filter((task) => task.id !== deleteId);
+      saveTasks(state.tasks);
+      closeDelete();
+      render();
+    }
+
+    function handleConsent() {
+      const record = loadConsent();
+      if (!record || record.noticeVersion !== NOTICE_VERSION) {
+        $("consent-modal").classList.add("visible");
+      }
+    }
+
+    function acceptConsent() {
+      saveConsent();
+      $("consent-modal").classList.remove("visible");
+    }
+
+    function initialize() {
+      state.tasks = loadTasks();
+      $("create-form").addEventListener("submit", addTask);
+      $("sort-by").addEventListener("change", (event) => {
+        state.sortBy = event.target.value;
+        render();
+      });
+      $("tag-filter").addEventListener("change", (event) => {
+        state.tagFilter = event.target.value;
+        render();
+      });
+      $("edit-cancel").addEventListener("click", closeEdit);
+      $("edit-form").addEventListener("submit", saveEdit);
+      $("delete-cancel").addEventListener("click", closeDelete);
+      $("delete-confirm").addEventListener("click", confirmDelete);
+      $("consent-accept").addEventListener("click", acceptConsent);
+      render();
+      handleConsent();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
