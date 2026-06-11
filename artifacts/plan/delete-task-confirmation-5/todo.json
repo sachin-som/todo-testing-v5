@@ -1,0 +1,7 @@
+[
+  { "id": "todo-1", "title": "Review task rendering/state to place delete confirmation state", "status": "completed" },
+  { "id": "todo-2", "title": "Add delete confirmation UI with warning text and actions", "status": "completed" },
+  { "id": "todo-3", "title": "Implement delete handler to remove task and persist storage", "status": "completed" },
+  { "id": "todo-4", "title": "Update tests for confirm delete, cancel delete, warning text", "status": "completed" },
+  { "id": "todo-5", "title": "Review accessibility/styling for delete controls", "status": "completed" }
+]

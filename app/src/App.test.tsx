@@ -341,4 +341,70 @@ describe('Task experience (US-001 + US-002 + US-003 + US-004)', () => {
     const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
     expect(stored[0].status).toBe('completed')
   })
+
+  it('removes a task after delete confirmation and updates storage', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Keep me',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          title: 'Remove me',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const card = screen.getByText('Remove me').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /delete task/i }))
+
+    expect(within(card).getByRole('alert')).toHaveTextContent(
+      'Deleting a task is permanent and cannot be undone.',
+    )
+
+    await user.click(within(card).getByRole('button', { name: /confirm delete/i }))
+
+    expect(screen.queryByText('Remove me')).not.toBeInTheDocument()
+    expect(screen.getByText('Keep me')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored).toHaveLength(1)
+    expect(stored[0].title).toBe('Keep me')
+  })
+
+  it('keeps the task when delete is canceled', async () => {
+    const user = userEvent.setup()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Stay put',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+      ]),
+    )
+
+    render(<App />)
+
+    const card = screen.getByText('Stay put').closest('li') as HTMLElement
+    await user.click(within(card).getByRole('button', { name: /delete task/i }))
+    await user.click(within(card).getByRole('button', { name: /cancel/i }))
+
+    expect(screen.getByText('Stay put')).toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '[]')
+    expect(stored).toHaveLength(1)
+    expect(stored[0].title).toBe('Stay put')
+  })
 })

@@ -43,6 +43,7 @@ export function App() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<EditDraft | null>(null)
   const [editTitleError, setEditTitleError] = useState('')
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
 
   const activeTasks = useMemo(
     () => tasks.filter((task) => task.status === 'active'),
@@ -153,6 +154,27 @@ export function App() {
     setEditTitleError('')
   }
 
+  const requestDelete = (taskId: string) => {
+    if (editingTaskId === taskId) {
+      cancelEditing()
+    }
+    setDeleteTaskId(taskId)
+  }
+
+  const cancelDelete = () => {
+    setDeleteTaskId(null)
+  }
+
+  const confirmDelete = (taskId: string) => {
+    let latestTasks: Task[] = []
+    setTasks((prevTasks) => {
+      latestTasks = prevTasks.filter((task) => task.id !== taskId)
+      return latestTasks
+    })
+    persistTasks(latestTasks)
+    setDeleteTaskId(null)
+  }
+
   const renderTask = (task: Task, isCompletedSection: boolean) => {
     const isEditing = editingTaskId === task.id && editDraft !== null
 
@@ -248,6 +270,20 @@ export function App() {
                 Mark Complete
               </button>
             )}
+            <button type="button" onClick={() => requestDelete(task.id)}>
+              Delete Task
+            </button>
+            {deleteTaskId === task.id ? (
+              <div className="delete-confirmation">
+                <p role="alert">Deleting a task is permanent and cannot be undone.</p>
+                <button type="button" onClick={() => confirmDelete(task.id)}>
+                  Confirm Delete
+                </button>
+                <button type="button" onClick={cancelDelete}>
+                  Cancel
+                </button>
+              </div>
+            ) : null}
           </>
         )}
       </li>
